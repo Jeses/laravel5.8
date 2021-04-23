@@ -1,7 +1,7 @@
 {
-    "name": "laravel/laravel",
+    "name": "zhengcai/laravel5.8",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "The Laravel5.8 Framework.",
     "keywords": [
         "framework",
         "laravel"
