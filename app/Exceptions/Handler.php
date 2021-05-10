@@ -39,23 +39,28 @@ class Handler extends ExceptionHandler
     public function report(Exception $exception)
     {
         //parent::report($exception);
-		//避免重复记录日志
-		if($this->logId != Utils::requestId()){
-			//记录日志
-			$this->logId = Utils::requestId();
-			$excErr['message'] = $exception->getMessage();
-			$excErr['line'] = $exception->getLine();
-			$excErr['file'] = $exception->getFile();
-			BLogger::warning('Exception',CommonCode::OTHER_ERROR,request()->all(),$excErr);
-		}
+		//避免重复记录日志、区分异常或终止
+		$exceptionMsg = $exception->getMessage();
+		if(!empty($exceptionMsg)){
+			if ($this->logId != Utils::requestId()) {
+				//记录日志
+				$this->logId = Utils::requestId();
+				$excErr['message'] = $exception->getMessage();
+				$excErr['line'] = $exception->getLine();
+				$excErr['file'] = $exception->getFile();
+				BLogger::warning('Exception', CommonCode::OTHER_ERROR, request()->all(), $excErr);
+			}
 
-		if(env('APP_ENV') == 'dev' || !empty(request()->input('isDebug'))){
-			$message = $exception->getMessage().' on Line:'.$exception->getLine().' of file:'.$exception->getFile();
-			CommonCode::code(CommonCode::OTHER_ERROR)->message($message)->response(true);
-		}
+			if (env('APP_ENV') == 'dev' || !empty(request()->input('isDebug'))) {
+				$message = $exception->getMessage() . ' on Line:' . $exception->getLine() . ' of file:' . $exception->getFile();
+				CommonCode::code(CommonCode::OTHER_ERROR)->message($message)->response(true);
+			}
 
-		//避免服务器异常导致客户端崩溃
-		CommonCode::code(CommonCode::OTHER_ERROR)->response(true);
+			//避免服务器异常导致客户端崩溃
+			CommonCode::code(CommonCode::OTHER_ERROR)->response(true);
+		}else{
+			parent::report($exception);
+		}
     }
 
     /**
